@@ -8,10 +8,10 @@ let visitCounter = 0
 try{
     visitCounter = fs.readFileSync('stats/visits.txt', 'utf8')
 }catch(e){
-    
+
 }
 
-const indexTemplate = fs.readFileSync('templates/index.html', 'utf8')
+const indexTemplate = fs.readFileSync('templates/index.tpl', 'utf8')
 const genericTemplate = fs.readFileSync('templates/generic.html', 'utf8')
 const elementsTemplate = fs.readFileSync('templates/elements.html', 'utf8')
 const errorTemplate = fs.readFileSync('templates/error-404.html', 'utf8')
@@ -23,7 +23,7 @@ eventHandler.on('increment_visit', (currentRoute) => {
     console.log(`Tengo ${visitCounter} visitas`)
 
     fs.writeFileSync('stats/visits.txt', visitCounter)
-    
+
     let sectionFile = 'stats/'+currentRoute.replace("/","")+'.txt'
 
     fs.writeFileSync(sectionFile,0)
