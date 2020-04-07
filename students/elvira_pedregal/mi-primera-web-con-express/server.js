@@ -1,7 +1,6 @@
 const express = require('express') //INCLUIR DEPENDENCIAS
 const port = process.env.PORT || 8080
 const app = express()//CREACION DE LA INSTANCIA  // app es instancia de la aplicacion de express
-
 // no podemos acceder a app en otro fichero. dentro del objeto res tenemos la propiedad .app donde podemos acceder a las variables globales o a otros metodos disponibles.
 
 //seteamos la variable global "app-name"
@@ -16,7 +15,12 @@ app.set('app-name','my test app');
 //se ESCUCHAR las peticiones sobre las rutas y se realizan operaciones segun la ruta
 //DEFINIR una RESPUESTA
 //creacion de una ruta get
-app.get('/:nombre?', (req , res) => {
+//los : significa que es una variable en la ruta y el ? es que es opcional.
+app.get('/:nombre?/:dni?', (req , res) => {
+  if(req.params.dni){
+    let nif = getDNILetter(req.params.dni)
+    res.send(`Hola ${req.params.nombre} esta app se llama ${app.get('app-name')} y tu dni es ${nif}`)
+  }
   if(req.params.nombre){
     res.send(`Hola ${req.params.nombre} esta app se llama ${app.get('app-name')}`)
   } else {
@@ -37,3 +41,11 @@ app.post('/', (req , res) => {
 app.listen(port,() => {
   console.log(`servidor activo en http://localhost:${port}!`)
 })
+
+
+function getDNILetter(dni){
+  let cadena ="TRWAGMYFPDXBNJZSQVHLCKET"
+  let posicion = dni % 23
+  letra = cadena.substring(posicion,posicion + 1)
+  return dni + letra
+}
