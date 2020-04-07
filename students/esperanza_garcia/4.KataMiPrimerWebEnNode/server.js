@@ -1,5 +1,5 @@
 /* Puerto */
-const serverPort = process.env.PORT || 8081
+const serverPort = process.env.PORT || 8080
 
 /* Importar el modulo fs */
 const fs = require('fs')
@@ -19,8 +19,9 @@ const isValidRoute = function(route) {
 
 };
  function ownFunctionServer (req, res) {
-  console.log(currentRoute)
+
   let currentRoute = req.url
+  console.log(currentRoute)
 
   if(currentRoute === '/' || currentRoute === '/index'){
     res.writeHead(200, {'Content-Type': 'text/html;charset=utf-8'})
