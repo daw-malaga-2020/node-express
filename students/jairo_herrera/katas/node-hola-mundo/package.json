@@ -1,0 +1,12 @@
+{
+  "name": "hola-mundo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "hola-mundo.js",
+  "scripts": {
+    "test": "hola-mundo.js",
+    "start": "node server.js"
+  },
+  "author": "Jairo",
+  "license": "MIT"
+}
