@@ -1,0 +1,16 @@
+{
+  "name": "mi-primera-web-con-node",
+  "version": "1.0.0",
+  "description": "primera web con node y apuntes",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server-node",
+    "dev": "nodemon server-node"
+  },
+  "author": "elfo",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
+}
