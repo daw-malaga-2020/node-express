@@ -1,0 +1,16 @@
+{
+    "name": "miprimerawebnode",
+    "version": "1.0.0",
+    "main": "server.js",
+    "scripts": {
+        "dev": "nodemon server",
+        "nodemon": "nodemon --watch . -e css,html,js server.js"
+
+    },
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "devDependencies": {
+        "nodemon": "^2.0.2"
+    }
+}
