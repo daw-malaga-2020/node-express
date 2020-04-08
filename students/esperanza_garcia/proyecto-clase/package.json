@@ -1,0 +1,17 @@
+{
+  "name": "proyecto-clase",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "nodemon": "nodemon --watch . -e css,html,js server.js",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  },
+  "dependencies": {},
+  "description": ""
+}
