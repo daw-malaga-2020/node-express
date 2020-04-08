@@ -1,17 +1,19 @@
-//importamos todos los modulos que vamos a necesitar
+//importamos los modulos
 const express = require('express')
-const fs = require('fs') // cargar las plantillas y devolverlas al usuario en funcion a la ruta q se indique
-const events = require('events')
+const fs = require('fs') // modulo fs encargado de cargar las plantillas y devolverlas
+const events = require('events') //modulo eventos
 const eventHandler = new events.EventEmitter()
 
-const app = express()
-const serverPort = 8080 // puerto del servidor
+const port = process.env.PORT || 8080 //definimos el puerto
+const app = express() //creamos la instancia app
+
+
 let visitCounter = 0 //inicializamos las visitas
 
-
+// intenta leer el fichero stats/visits sino imprime
 try{
-    visitCounter = fs.readFileSync('stats/visits.txt', 'utf8') // recuperar las visitas contadas que tenia (si el fichero existe, meto el recuento anterior)
-}catch(e){
+  visitCounter = fs.readFileSync('stats/visits.txt', 'utf8') // recuperar las visitas contadas que tenia (si el fichero existe, meto el recuento anterior)
+} catch(e){
   console.info('old visit file not found, counting from 0')
 }
 
@@ -22,130 +24,63 @@ const elementsTemplate = fs.readFileSync('templates/elements.html', 'utf8')
 const errorTemplate = fs.readFileSync('templates/error-404.html', 'utf8')
 const statsTemplate = fs.readFileSync('templates/stats.html', 'utf8')
 
-//un subscriber (evento) funcion que esta eschuchando cada vez que se ejecuta el evento incremet visits
-//en funcion a la ruta actual, se escriben las visitas que tenga en memoria
+
 eventHandler.on('increment_visit', (currentRoute) => {
-    console.log("hey!, ha saltado el evento increment_visit: "+currentRoute)
+    console.log("hey!, ha saltado el evento increment_visit: "+ currentRoute)
     visitCounter++ //incremento de la visita
-    console.log(`Tengo ${visitCounter} visitas`)
+
+    if (visitCounter === 500000){
+      //puedo tambien lanzar un evento dentro de otro
+      event.emit('send_access_stat_email', visitCounter)
+    }
 
     fs.writeFileSync('stats/visits.txt', visitCounter) //escribe en el fichero las visitas q tenga en memoria
 
-    let sectionFile = 'stats/'+currentRoute.replace("/","")+'.txt' //escribir las visitas por seccion
+    //let sectionFile = 'stats/'+ currentRoute.replace("/","") +'.txt' //declara las secciones
+    let sectionFile =`stats/${currentRoute}.txt`
 
     fs.writeFileSync(sectionFile,0)
 
+    console.info(`Tengo ${visitCounter} visitas`)
 })
 
-//eventHandler.on('send_access_stat_email', () => {
+eventHandler.on('send_access_stat_email', () => {
     //enviar un email
+})
 
-//})
+app.get('/', (req , res) => {
+  console.log(req.url)
+  res.redirect('/index')
+})
 
-
-//metodo de utilidad para ver si las rutas son validas o no
-function isValidRoute(route) {
-    return (route === '/index' ||
-        route === '/' ||
-        route === '/generic' ||
-        route === '/stats' ||
-        route === '/elements')
-
-}
-
-//VIENE LO IMPORTANTE//
-
-app.get('/', (req, res)=>{
-  res.redirect('/index');
+app.get('/index', (req , res) => {
   eventHandler.emit('increment_visit', req.url) //emitir el evento
-
-
-  res.writeHead(200, '{"Content-Type": "text/html;charset=UTF-8"}') // la respuesta es correcta y lo que devuelve al navegador es un contenido de texto html y en utf-8 y este lo procesa como una pagina web y muestra las etiquetas procesadas. INFORMACION PARA EL NAVEGADOR
-  res.write(indexTemplate) //mediante el metodo write envio el cuerpo de la respuesta, el contenido como tal. Le paso el contenido de la pagina principal que es lo que va a recibir.
-  res.end()
+  res.send(indexTemplate)
 })
 
-app.get('/index', (req,res)=>{
-  res.send('ruta :'+ req.url)
+app.get('/elements', (req , res) => {
+  eventHandler.emit('increment_visit', req.url)
+  res.send(elementsTemplate)
 })
 
-app.get('/elements', (req,res)=>{
-  res.send('ruta elements')
+app.get('/generic', (req  ,res) => {
+  eventHandler.emit('increment_visit', req.url)
+  res.send(genericTemplate)
 })
 
-app.get('/generic', (req,res)=>{
-  res.send('ruta generic')
+app.get('/stats', (req , res) => {
+
+  eventHandler.emit('increment_visit', req.url)
+  eventHandler.emit('send_access_stat_email')
+
+  let parseredStatsTemplate = statsTemplate.replace("{{totalVisits}}",visitCounter).replace("{{totalVisitsDouble}}",visitCounter*2);
+  res.send(statsTemplate)
 })
 
-app.get('/stats', (req,res)=>{
-  res.send('ruta principal tambien')
+app.set('error-404', (req,res)=>{
+  res.send(errorTemplate)
 })
 
-app.get('error-404', (req,res)=>{
-  res.send('ruta principal tambien')
+app.listen(port, () => {
+  console.info(`Running http server on http://localhost:${port}`)
 })
-//esta funcion callback se ejecuta cada vez que alguien hace una peticion a mi servidor
-
-function serverRequestHandler(req, res) {
-
-    console.log(req.url)
-
-    let currentRoute = req.url //obtener la ruta actual. dentro del objeto request (que recibe esta funcion call back de la funcion creadora del servidor) tengo la propiedad url, donde obtendo una cadena de texto con la ruta
-
-
-
-    //diferentes acciones segun la ruta que reciba
-    if (currentRoute === '/index' ||
-        currentRoute === '/') {
-
-        eventHandler.emit('increment_visit', currentRoute) //emitir el evento
-
-        res.writeHead(200, '{"Content-Type": "text/html;charset=UTF-8"}') // la respuesta es correcta y lo que devuelve al navegador es un contenido de texto html y en utf-8 y este lo procesa como una pagina web y muestra las etiquetas procesadas. INFORMACION PARA EL NAVEGADOR
-        res.write(indexTemplate) //mediante el metodo write envio el cuerpo de la respuesta, el contenido como tal. Le paso el contenido de la pagina principal que es lo que va a recibir.
-        res.end()
-    }
-
-    if (currentRoute === '/elements') {
-
-        eventHandler.emit('increment_visit', currentRoute)
-
-        res.writeHead(200, '{"Content-Type": "text/html;charset=UTF-8"}')
-        res.write(elementsTemplate)
-        res.end()
-    }
-
-    if (currentRoute === '/stats') {
-
-        eventHandler.emit('increment_visit', currentRoute)
-        eventHandler.emit('send_access_stat_email')
-
-        res.writeHead(200, '{"Content-Type": "text/html;charset=UTF-8"}')
-        let parseredStatsTemplate = statsTemplate.replace("{{totalVisits}}",visitCounter).replace("{{totalVisitsDouble}}",visitCounter*2);
-        res.write(parseredStatsTemplate)
-        res.end()
-    }
-
-    if (currentRoute === '/generic') {
-
-        eventHandler.emit('increment_visit', currentRoute)
-
-        res.writeHead(200, '{"Content-Type": "text/html;charset=UTF-8"}')
-        res.write(genericTemplate)
-        res.end() //cortar la ejecucion de la respuesta. pierdo el control
-    }
-
-    //TODO: si no hay coincidencia de rutas, error 404
-
-    if (!isValidRoute(currentRoute)) {
-        res.writeHead(404, '{"Content-Type": "text/html;charset=UTF-8"}') //404 --> codigos de estado // cuando el recurso no ha sido encontrado
-        res.write(errorTemplate)
-        res.end()
-    }
-
-}
-
-app.listen(serverPort, () => {
-  console.info(`Running http server on http://localhost:${serverPort}`)
-})
-
-//arrancar el SERVIDOR y el callback con la funcion de manejo/callback
