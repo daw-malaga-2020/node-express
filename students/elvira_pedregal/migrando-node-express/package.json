@@ -1,0 +1,17 @@
+{
+  "name": "migrando-node-express",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server-express.js",
+  "scripts": {
+    "dev": "nodemon server-express"
+  },
+  "author": "elfo",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
+}
