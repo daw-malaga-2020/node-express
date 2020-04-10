@@ -1,0 +1,17 @@
+{
+  "name": "kata-4_mi_primera_web_con_node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "nodemon": "nodemon --watch . -e css,html,js server.js"  
+
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "nodemon": "^2.0.3"
+  }
+}
