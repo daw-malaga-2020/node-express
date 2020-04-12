@@ -1,0 +1,14 @@
+{
+  "name": "node4",
+  "version": "1.0.0",
+  "description": "My project node",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "wuendi",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
