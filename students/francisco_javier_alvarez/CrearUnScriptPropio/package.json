@@ -1,0 +1,12 @@
+{
+    "name": "crearunscriptpropio",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "script": "echo ¡Hi developer!, Node is cool"
+    },
+    "author": "",
+    "license": "ISC"
+}
