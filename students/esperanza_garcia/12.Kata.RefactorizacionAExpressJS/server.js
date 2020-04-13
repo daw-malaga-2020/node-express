@@ -3,12 +3,22 @@ const app = express()
 const fs = require('fs')
 
 const port= process.env.PORT || 8080
+let visits = 0;
 
 const indexTemplate = fs.readFileSync('./index.html', 'utf8')
 const genericTemplate = fs.readFileSync('./generic.html', 'utf8')
 const elementsTemplate = fs.readFileSync('./elements.html', 'utf8')
+const notFoundTemplate = fs.readFileSync('./404notFound.html', 'utf8')
 
-app.get('/',(req, res)=>{
+function visitCounter (req, res, next){
+  visits++
+  console.info(visits)
+  next()
+}
+
+
+app.get('/',visitCounter, (req, res)=>{
+  console.log(visitCounter)
   res.send(indexTemplate)
 })
 app.get('/index',(req, res)=>{
@@ -21,7 +31,7 @@ app.get('/elements',(req, res)=>{
   res.send(elementsTemplate)
 })
 app.use( (req, res)=>{
-  res.send(`La web introducida no es correcta`)
+  res.send(notFoundTemplate)
 })
 
 app.listen(port, ()=>{
