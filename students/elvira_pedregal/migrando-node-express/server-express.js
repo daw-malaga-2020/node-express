@@ -4,9 +4,8 @@ const fs = require('fs') // modulo fs encargado de cargar las plantillas y devol
 const events = require('events') //modulo eventos
 const eventHandler = new events.EventEmitter()
 
-const port = process.env.PORT || 8080 //definimos el puerto
 const app = express() //creamos la instancia app
-
+const port = process.env.PORT || 8080 //definimos el puerto
 
 let visitCounter = 0 //inicializamos las visitas
 
@@ -26,18 +25,18 @@ const statsTemplate = fs.readFileSync('templates/stats.html', 'utf8')
 
 
 eventHandler.on('increment_visit', (currentRoute) => {
-    console.log("hey!, ha saltado el evento increment_visit: "+ currentRoute)
+    console.log(`hey!, ha saltado el evento increment_visit en ${currentRoute}`)
     visitCounter++ //incremento de la visita
 
-    if (visitCounter === 500000){
+    if (visitCounter === 1000000){
       //puedo tambien lanzar un evento dentro de otro
       event.emit('send_access_stat_email', visitCounter)
     }
 
     fs.writeFileSync('stats/visits.txt', visitCounter) //escribe en el fichero las visitas q tenga en memoria
 
-    //let sectionFile = 'stats/'+ currentRoute.replace("/","") +'.txt' //declara las secciones
-    let sectionFile =`stats/${currentRoute}.txt`
+    let sectionFile = 'stats/'+ currentRoute.replace("/","") +'.txt' //declara las secciones
+
 
     fs.writeFileSync(sectionFile,0)
 
@@ -49,7 +48,6 @@ eventHandler.on('send_access_stat_email', () => {
 })
 
 app.get('/', (req , res) => {
-  console.log(req.url)
   res.redirect('/index')
 })
 
@@ -63,22 +61,23 @@ app.get('/elements', (req , res) => {
   res.send(elementsTemplate)
 })
 
-app.get('/generic', (req  ,res) => {
+app.get('/generic', (req , res) => {
   eventHandler.emit('increment_visit', req.url)
   res.send(genericTemplate)
 })
 
+
+
 app.get('/stats', (req , res) => {
 
   eventHandler.emit('increment_visit', req.url)
-  eventHandler.emit('send_access_stat_email')
 
   let parseredStatsTemplate = statsTemplate.replace("{{totalVisits}}",visitCounter).replace("{{totalVisitsDouble}}",visitCounter*2);
   res.send(statsTemplate)
 })
 
-app.set('error-404', (req,res)=>{
-  res.send(errorTemplate)
+app.use((req , res)=>{
+  res.status(404).send(errorTemplate)
 })
 
 app.listen(port, () => {
